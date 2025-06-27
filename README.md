@@ -7,4 +7,4 @@ Backend API for the MyProfile project.
 1. Clone the repository:
    ```bash
    git clone <repo-url>
-   cd MyProfile/server
+   cd MyProfile/server ي
