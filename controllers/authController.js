@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const Users = require('../models/users');
+const Auth = require('../models/auth');
 const jwtHelpers = require('../utils/jwtHelpers');
 const TokenBlocklist = require('../models/tokenBlocklist');
 
@@ -9,7 +9,7 @@ exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
         // البحث عن المستخدم في قاعدة البيانات
-        const user = await Users.findOne({ username });
+        const user = await Auth.findOne({ username });
         if (!user) {
             return res.status(401).json({ message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
         }
@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
         const { username, password } = req.body;
 
         // تحقق من وجود المستخدم مسبقاً
-        let user = await Users.findOne({ username });
+        let user = await Auth.findOne({ username });
         if (user) {
             return res.status(400).json({ message: 'اسم المستخدم موجود بالفعل' });
         }
@@ -43,7 +43,7 @@ exports.register = async (req, res) => {
         const hashed = await bcrypt.hash(password, salt);
 
         // إنشاء وحفظ المستخدم الجديد
-        user = new Users({ username, password: hashed });
+        user = new Auth({ username, password: hashed });
         await user.save();
 
         // إصدار التوكن
@@ -85,7 +85,7 @@ exports.logout = async (req, res) => {
 exports.me = async (req, res) => {
     try {
         // البحث عن المستخدم باستخدام الـ id الموجود في التوكن
-        const user = await Users.findById(req.userId).select('-password');
+        const user = await Auth.findById(req.userId).select('-password');
         if (!user) {
             return res.status(404).json({ message: 'المستخدم غير موجود' });
         }
