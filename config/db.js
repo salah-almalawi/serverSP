@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Use MONGODB_URI from environment or fallback to localhost
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/myprofile';
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/SmartPresentation';
 
 // Connect to MongoDB
 mongoose.connect(uri);
