@@ -25,11 +25,6 @@ exports.login = async (req, res) => {
     }
 };
 
-// دالة تسجيل الخروج
-exports.logout = (req, res) => {
-    res.json({ message: 'Logged out successfully' });
-};
-
 // دالة التسجيل الجديدة
 exports.register = async (req, res) => {
     try {
@@ -56,4 +51,9 @@ exports.register = async (req, res) => {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
     }
+};
+
+// دالة تسجيل الخروج
+exports.logout = (req, res) => {
+    res.json({ message: 'Logged out successfully' });
 };
