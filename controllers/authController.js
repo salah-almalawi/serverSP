@@ -1,13 +1,15 @@
 const bcrypt = require('bcryptjs');
-const Auth = require('../models/auth');
+const Users = require('../models/users');
 const jwtHelpers = require('../utils/jwtHelpers');
+const TokenBlocklist = require('../models/tokenBlocklist');
+
 
 // دالة تسجيل الدخول
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
         // البحث عن المستخدم في قاعدة البيانات
-        const user = await Auth.findOne({ username });
+        const user = await Users.findOne({ username });
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -31,7 +33,7 @@ exports.register = async (req, res) => {
         const { username, password } = req.body;
 
         // تحقق من وجود المستخدم مسبقاً
-        let user = await Auth.findOne({ username });
+        let user = await Users.findOne({ username });
         if (user) {
             return res.status(400).json({ message: 'Username already exists' });
         }
@@ -41,7 +43,7 @@ exports.register = async (req, res) => {
         const hashed = await bcrypt.hash(password, salt);
 
         // إنشاء وحفظ المستخدم الجديد
-        user = new Auth({ username, password: hashed });
+        user = new Users({ username, password: hashed });
         await user.save();
 
         // إصدار التوكن
@@ -53,7 +55,36 @@ exports.register = async (req, res) => {
     }
 };
 
+
+
 // دالة تسجيل الخروج
-exports.logout = (req, res) => {
-    res.json({ message: 'Logged out successfully' });
+exports.logout = async (req, res) => {
+    try {
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+        if (authHeader) {
+            const token = authHeader.split(' ')[1];
+            if (token) {
+                const blocklistedToken = new TokenBlocklist({ token });
+                await blocklistedToken.save();
+            }
+        }
+        res.json({ message: 'Logged out successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.me = async (req, res) => {
+    try {
+        // البحث عن المستخدم باستخدام الـ id الموجود في التوكن
+        const user = await Users.findById(req.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 };

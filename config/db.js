@@ -12,8 +12,15 @@ mongoose.connect(uri);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
+db.once('open', async () => {
     console.log(`Connected to MongoDB at ${uri}`);
+    try {
+        // Ensure TTL index is created for the TokenBlocklist collection
+        await mongoose.model('TokenBlocklist').createIndexes();
+        console.log('TokenBlocklist TTL index ensured.');
+    } catch (error) {
+        console.error('Error creating TTL index for TokenBlocklist:', error);
+    }
 });
 
 module.exports = db;
