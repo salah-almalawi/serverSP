@@ -55,8 +55,6 @@ exports.register = async (req, res) => {
     }
 };
 
-
-
 // دالة تسجيل الخروج
 exports.logout = async (req, res) => {
     try {
