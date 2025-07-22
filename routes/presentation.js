@@ -51,4 +51,12 @@ router.get(
   presentationController.listPresentations
 );
 
+// مسار حذف عرض تقديمي (DELETE)
+router.delete(
+    '/:id',
+    protect,
+    checkOwnership,
+    presentationController.deletePresentation
+);
+
 module.exports = router;

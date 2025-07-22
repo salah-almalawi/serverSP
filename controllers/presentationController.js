@@ -348,3 +348,55 @@ exports.listPresentations = async (req, res) => {
     res.status(500).json({ message: "خطأ في الخادم أثناء جلب العروض" });
   }
 };
+
+// @desc    Delete a presentation
+// @route   DELETE /api/presentations/:id
+// @access  Private
+exports.deletePresentation = async (req, res) => {
+  try {
+    const presentation = req.presentation; // تم إرفاقه بواسطة ميدل وير checkOwnership
+
+    // ملاحظة: لا يتم التحقق من isDraft هنا للسماح بحذف أي عرض يمتلكه المستخدم
+    // إذا أردت تقييد الحذف للمسودات فقط، يمكنك إضافة الشرط التالي:
+    // if (!presentation.isDraft) {
+    //   return res.status(403).json({ message: "لا يمكن حذف العروض الجاهزة، يجب تحويلها لمسودة أولاً" });
+    // }
+
+    // 1. أرشفة جميع الملفات المرتبطة بالعرض
+    const filePathsToArchive = [
+      presentation.filePart6,
+      presentation.filePart7,
+      presentation.filePart8,
+      presentation.filePart9,
+      presentation.filePart10,
+      ...(presentation.securityOutput?.images || [])
+    ].filter(Boolean); // إزالة القيم الفارغة
+
+    const archivedFilesPromises = filePathsToArchive.map(filePath => archiveFile(filePath));
+    const archivedResults = await Promise.all(archivedFilesPromises);
+    const successfullyArchived = archivedResults.filter(Boolean);
+
+    // 2. حذف العرض من قاعدة البيانات
+    await Presentation.findByIdAndDelete(req.params.id);
+
+    // 3. تحديث مستخدم الـ Auth بإزالة معرف العرض
+    await Auth.findByIdAndUpdate(
+      req.userId,
+      { $pull: { presentationIDs: req.params.id } }
+    );
+
+    // 4. تسجيل عملية الحذف
+    console.log(`[${new Date().toISOString()}] User ${req.userId} deleted presentation ${req.params.id}`);
+
+    res.status(200).json({
+      message: "تم حذف العرض التقديمي وأرشفة ملفاته بنجاح",
+      archivedFilesCount: successfullyArchived.length
+    });
+
+  } catch (err) {
+    console.error("خطأ في حذف العرض التقديمي:", err);
+    // في حالة حدوث خطأ، يجب التفكير في استراتيجية لاستعادة الملفات التي أُرشفت
+    // لكن للتبسيط الآن، سنكتفي بتسجيل الخطأ
+    res.status(500).json({ message: "خطأ في الخادم أثناء حذف العرض التقديمي: " + err.message });
+  }
+};
