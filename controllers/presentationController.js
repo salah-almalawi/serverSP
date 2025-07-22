@@ -286,6 +286,7 @@ exports.listPresentations = async (req, res) => {
     const sortOrder = req.query.order === 'asc' ? 1 : -1;
     const sortOptions = { [sortField]: sortOrder };
 
+    console.log('Presentation object:', Presentation);
     // استخدام aggregate مع $facet لجلب البيانات والإحصائيات في استعلام واحد
     const result = await Presentation.aggregate([
       { $match: filter },
