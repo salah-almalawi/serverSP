@@ -10,6 +10,7 @@ require('./config/db');
 
 
 const authRouter = require('./routes/auth');
+const presentationRouter = require('./routes/presentation');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/api/auth', authRouter);
+app.use('/api/presentations', presentationRouter);
 
 
 module.exports = app;

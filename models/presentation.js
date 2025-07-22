@@ -11,11 +11,6 @@ const presentationSchema = new mongoose.Schema({
     required: true,
     default: true
   },
-  createdAt: {
-    type: Date,
-    required: true,
-    default: Date.now
-  },
   mubdee: {
     guestImage: String,
     organization: String,
@@ -80,7 +75,11 @@ const presentationSchema = new mongoose.Schema({
     guestImage: String,
     closingText: String
   }
-});
+}, { timestamps: true });
+
+presentationSchema.index({ owner: 1, createdAt: -1 });
+presentationSchema.index({ owner: 1, updatedAt: -1 });
+presentationSchema.index({ owner: 1, isDraft: 1 });
 
 // إنشاء النموذج
 const Presentation = mongoose.model('Presentation', presentationSchema);

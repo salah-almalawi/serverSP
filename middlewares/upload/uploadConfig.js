@@ -6,10 +6,10 @@ const fs = require('fs');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // التأكد من وجود معرف المستخدم (user ID) في الطلب
-        if (!req.user || !req.user.id) {
+        if (!req.userId) {
             return cb(new Error('User ID not found in request. Authentication middleware might be missing or failed.'), null);
         }
-        const userId = req.user.id;
+        const userId = req.userId;
         let subfolder = 'others'; // مجلد افتراضي لأنواع الملفات غير المحددة
 
         // تحديد المجلد الفرعي بناءً على نوع الملف
@@ -40,6 +40,7 @@ const fileFilter = (req, file, cb) => {
     const allowedTypes = [
         'image/jpeg',
         'image/png',
+        'image/webp', // إضافة WebP
         'application/pdf',
         'application/vnd.google-earth.kml+xml', // KML
         'application/vnd.google-earth.kmz'      // KMZ

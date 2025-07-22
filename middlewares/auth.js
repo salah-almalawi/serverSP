@@ -2,7 +2,7 @@
 const jwtHelpers = require('../utils/jwtHelpers');
 const TokenBlocklist = require('../models/tokenBlocklist');
 
-exports.check = async (req, res, next) => {
+exports.protect = async (req, res, next) => {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     if (!authHeader) {
         return res.status(401).json({ message: 'تحقق من أنك تمتلك التوكن المطلوب.' });
