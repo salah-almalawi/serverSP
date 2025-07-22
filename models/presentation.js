@@ -83,3 +83,6 @@ presentationSchema.index({ owner: 1, isDraft: 1 });
 
 // إنشاء النموذج
 const Presentation = mongoose.model('Presentation', presentationSchema);
+
+// إضافة هذا السطر في النهاية لتصدير النموذج
+module.exports = Presentation;
