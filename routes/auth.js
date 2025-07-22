@@ -12,8 +12,8 @@ router.post('/login', authCtrl.login);
 // تسجيل الخروج
 router.post('/logout', authCtrl.logout);
 
-
-router.get('/me', authMiddleware.check, authCtrl.me);
+// جلب بيانات المستخدم الحالي
+router.get('/me', authMiddleware.protect, authCtrl.me);
 
 
 module.exports = router;
