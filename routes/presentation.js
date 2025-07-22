@@ -9,12 +9,14 @@ const presentationController = require('../controllers/presentationController');
 router.post(
   '/',
   protect,
-  upload.array('securityImages', 10),
-  upload.single('filePart6'),
-  upload.single('filePart7'),
-  upload.single('filePart8'),
-  upload.single('filePart9'),
-  upload.single('filePart10'),
+  upload.fields([
+    { name: 'securityImages', maxCount: 10 },
+    { name: 'filePart6', maxCount: 1 },
+    { name: 'filePart7', maxCount: 1 },
+    { name: 'filePart8', maxCount: 1 },
+    { name: 'filePart9', maxCount: 1 },
+    { name: 'filePart10', maxCount: 1 }
+  ]),
   presentationController.createPresentation
 );
 
@@ -23,12 +25,14 @@ router.put(
   '/:id',
   protect,
   checkOwnership, // التحقق من الملكية قبل الرفع
-  upload.array('securityImages', 10),
-  upload.single('filePart6'),
-  upload.single('filePart7'),
-  upload.single('filePart8'),
-  upload.single('filePart9'),
-  upload.single('filePart10'),
+  upload.fields([
+    { name: 'securityImages', maxCount: 10 },
+    { name: 'filePart6', maxCount: 1 },
+    { name: 'filePart7', maxCount: 1 },
+    { name: 'filePart8', maxCount: 1 },
+    { name: 'filePart9', maxCount: 1 },
+    { name: 'filePart10', maxCount: 1 }
+  ]),
   presentationController.updatePresentation
 );
 
